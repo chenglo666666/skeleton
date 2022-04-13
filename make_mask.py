@@ -96,36 +96,26 @@ def make_mask(img, length, store_location, store_name):
 
 # 只畫mask、dilate、儲存圖片
 
-'''
+
 def make_only_mask(img, length, store_location, store_name):
     if length == 21:
         hand_1 = np.array(hand1, dtype=np.int32)
-        filled = cv2.fillPoly(img, pts=[hand_1], color=(255, 255, 255))
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        plt.axis('off')
-        plt.imshow(img_rgb)
-        fig1 = plt.gcf()
-        # plt.show()
-        fig1.savefig(store_location + '\\' + store_name, bbox_inches='tight',
-                     transparent=True, pad_inches=0)
+        filled = np.zeros_like(img)
+        filled = cv2.fillPoly(filled, pts=[hand_1], color=(255, 255, 255))
+        cv2.imwrite(store_location + '\\' + store_name, filled)
     elif length == 42:
         hand_1 = np.array(hand1, dtype=np.int32)
         hand_2 = np.array(hand2, dtype=np.int32)
-        filled = cv2.fillPoly(img, pts=[hand_1], color=(
-            255, 255, 255)) + cv2.fillPoly(img, pts=[hand_2], color=(255, 255, 255))
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        plt.axis('off')
-        plt.imshow(img_rgb)
-        fig1 = plt.gcf()
-        # plt.show()
-        fig1.savefig(store_location + '\\' + store_name, bbox_inches='tight',
-                     transparent=True, pad_inches=0)
+        filled = np.zeros_like(img)
+        filled = cv2.fillPoly(filled, pts=[hand_1], color=(
+            255, 255, 255)) + cv2.fillPoly(filled, pts=[hand_2], color=(255, 255, 255))
+        cv2.imwrite(store_location + '\\' + store_name, filled)
     img1_loc = store_location + '\\' + store_name
     img1 = cv2.imread(img1_loc)
     kernal = np.ones((2, 2), np.uint8)
     dilate = cv2.dilate(img1, kernal, iterations=1)
     cv2.imwrite(store_location + '\\' + store_name, dilate)
-'''
+
 # 處理點
 
 
@@ -156,6 +146,7 @@ for i in range(0, len(frames)):
     frame = os.listdir('.\\frames\\' + frames[i])
     label = os.listdir('.\\label_landmark\\' + labels[i])
     save_loc = '.\\output_mask\\' + frames[i]
+    only_mask_save_loc = '.\\mask_with_black_bg\\' + frames[i]
     for j in range(0, len(frame)):
         save_name = frame[j]
         origin_img = cv2.imread('.\\frames\\' + frames[i] + '\\' + frame[j])
@@ -163,3 +154,5 @@ for i in range(0, len(frames)):
             json_data = json.load(f)
         json_data_segmentation(json_data)
         make_mask(origin_img, len(json_data), save_loc, save_name)
+        make_only_mask(origin_img, len(json_data),
+                       only_mask_save_loc, save_name)
