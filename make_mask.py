@@ -94,6 +94,38 @@ def make_mask(img, length, store_location, store_name):
     dilate = cv2.dilate(img1, kernal, iterations=1)
     cv2.imwrite(store_location + '\\' + store_name, dilate)
 
+# 只畫mask、dilate、儲存圖片
+
+'''
+def make_only_mask(img, length, store_location, store_name):
+    if length == 21:
+        hand_1 = np.array(hand1, dtype=np.int32)
+        filled = cv2.fillPoly(img, pts=[hand_1], color=(255, 255, 255))
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        plt.axis('off')
+        plt.imshow(img_rgb)
+        fig1 = plt.gcf()
+        # plt.show()
+        fig1.savefig(store_location + '\\' + store_name, bbox_inches='tight',
+                     transparent=True, pad_inches=0)
+    elif length == 42:
+        hand_1 = np.array(hand1, dtype=np.int32)
+        hand_2 = np.array(hand2, dtype=np.int32)
+        filled = cv2.fillPoly(img, pts=[hand_1], color=(
+            255, 255, 255)) + cv2.fillPoly(img, pts=[hand_2], color=(255, 255, 255))
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        plt.axis('off')
+        plt.imshow(img_rgb)
+        fig1 = plt.gcf()
+        # plt.show()
+        fig1.savefig(store_location + '\\' + store_name, bbox_inches='tight',
+                     transparent=True, pad_inches=0)
+    img1_loc = store_location + '\\' + store_name
+    img1 = cv2.imread(img1_loc)
+    kernal = np.ones((2, 2), np.uint8)
+    dilate = cv2.dilate(img1, kernal, iterations=1)
+    cv2.imwrite(store_location + '\\' + store_name, dilate)
+'''
 # 處理點
 
 
@@ -111,18 +143,6 @@ def json_data_segmentation(data):
             hand2[i-21][0] = data[i]['x']
             hand2[i-21][1] = data[i]['y']
 
-
-'''
-frames = os.listdir('.\\frames')
-for frame in frames:
-    for img in os.listdir('.\\frames\\' + frame):
-        image = cv2.imread(f'.\\frames\\{frame}\\{img}')
-
-labels = os.listdir('.\\label_landmark')
-for label in labels:
-    for js in os.listdir('.\\label_landmark\\' + label):
-        with open()
-'''
 
 # frames : frames中的資料夾位置list
 # labels : label_landmark中的資料夾位置list
@@ -143,22 +163,3 @@ for i in range(0, len(frames)):
             json_data = json.load(f)
         json_data_segmentation(json_data)
         make_mask(origin_img, len(json_data), save_loc, save_name)
-
-'''
-img_loc = '.\\frames\\00000\\00023.png'
-json_loc = ".\\label_landmark\\00000\\00023.json"
-# 讀取圖片 laod image
-origin_img = cv2.imread(img_loc)
-
-
-with open(json_loc) as f:
-    json_data = json.load(f)
-# print(json_data)
-json_data_segmentation(json_data)
-# print(hand1)
-# print(hand2)
-
-# draw_skeleton(origin_img, len(json_data))
-
-# make_mask(origin_img, len(json_data))
-'''
