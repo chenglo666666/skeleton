@@ -84,6 +84,8 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
     '''
     convex_hull_path = f'{outputMask}/ConvexHull'
     os.makedirs(convex_hull_path, exist_ok=True)
+    convex_hull_mask_path = f'{outputMask}/ConvexHullMask'
+    os.makedirs(convex_hull_mask_path, exist_ok=True)
     # visualize video
     '''
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -94,7 +96,8 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
     for frame in sorted(os.listdir(v)):
         image = cv2.imread(f'{v}/{frame}')
         cropped = image.copy()
-        #mask = np.zeros(image.shape[:2], dtype=np.uint8)
+        convex_hull_cropped = image.copy()
+        # mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
         frame = frame.split('.')[0]
         jsonFile = f'{landmarkRoot}/{video}/{frame}.json'
@@ -120,7 +123,7 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 crop[y0:y1, x0:x1, 1] = cropped[y0:y1, x0:x1, 1]
                 crop[y0:y1, x0:x1, 2] = cropped[y0:y1, x0:x1, 2]
 
-                # do convex hull
+                # do convex hull, return a numpy array with outline points
                 points = []
                 for i in range(0, 21):
                     points.append(Point(hand1[i][0], hand1[i][1]))
@@ -129,6 +132,27 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 for i in range(len(hull)):
                     outline1[i][0] = hand1[hull[i]][0]
                     outline1[i][1] = hand1[hull[i]][1]
+
+                # save convex hull's mask and convex hull's cropped images
+                rows = convex_hull_cropped.shape[0]
+                cols = convex_hull_cropped.shape[1]
+                channels = convex_hull_cropped.shape[2]
+                convex_hull_crop = np.zeros(
+                    convex_hull_cropped.shape, dtype=np.uint8)
+                coordinate = np.array(outline1, dtype=np.int32)
+                ignore_mask_color = (255,)*channels
+                convex_hull_crop = cv2.fillPoly(
+                    convex_hull_crop, [coordinate], ignore_mask_color)
+                convex_hull_img = cv2.bitwise_and(
+                    convex_hull_cropped, convex_hull_crop)
+
+                os.makedirs(f'{convex_hull_path}/{video}', exist_ok=True)
+                cv2.imwrite(
+                    f'{convex_hull_path}/{video}/{frame}.png', convex_hull_img)
+                os.makedirs(f'{convex_hull_mask_path}/{video}', exist_ok=True)
+                cv2.imwrite(
+                    f'{convex_hull_mask_path}/{video}/{frame}.png', convex_hull_crop)
+
                 '''
                 for i in hand_1:
                     # mask number set to 8
@@ -200,6 +224,28 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 for i in range(len(hull)):
                     outline2[i][0] = hand2[hull[i]][0]
                     outline2[i][1] = hand2[hull[i]][1]
+
+                # save convex hull's mask and convex hull's cropped images
+                rows = convex_hull_cropped.shape[0]
+                cols = convex_hull_cropped.shape[1]
+                channels = convex_hull_cropped.shape[2]
+                convex_hull_crop = np.zeros(
+                    convex_hull_cropped.shape, dtype=np.uint8)
+                coordinate1 = np.array(outline1, dtype=np.int32)
+                coordinate2 = np.array(outline2, dtype=np.int32)
+                ignore_mask_color = (255,)*channels
+                convex_hull_crop = cv2.fillPoly(convex_hull_crop, [coordinate1], ignore_mask_color) + cv2.fillPoly(
+                    convex_hull_crop, [coordinate2], ignore_mask_color)
+                convex_hull_img = cv2.bitwise_and(
+                    convex_hull_cropped, convex_hull_crop)
+
+                os.makedirs(f'{convex_hull_path}/{video}', exist_ok=True)
+                cv2.imwrite(
+                    f'{convex_hull_path}/{video}/{frame}.png', convex_hull_img)
+                os.makedirs(f'{convex_hull_mask_path}/{video}', exist_ok=True)
+                cv2.imwrite(
+                    f'{convex_hull_mask_path}/{video}/{frame}.png', convex_hull_crop)
+
                 '''
                 # save mask
                 os.makedirs(f'{maskPath}/{video}', exist_ok=True)
@@ -242,4 +288,5 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
     if len(os.listdir(f'{maskPath}/{video}')) != framesAmount:
         assert 'mask amount is incorrect!'
     '''
+    print(f'video: {video} is done.')
     print(f'video: {video} is done.')
