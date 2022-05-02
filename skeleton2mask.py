@@ -5,6 +5,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import math
 
 # draw lines for skeleton
 
@@ -73,14 +74,145 @@ def draw_skeleton(img, length, hand_1, hand_2):
 
 def random_noises(hand):
     for i in range(0, len(hand)):
-        x_or_y = random.randint(0, 1)
-        shift_distance = random.randint(-1, 1)
+        x_or_y = random.randint(0, 4)
+        shift_distance = random.randint(-2, 2)
         if x_or_y == 0:
             hand[i][0] += shift_distance
-        else:
+        elif x_or_y == 1:
             hand[i][1] += shift_distance
+        elif x_or_y == 2:
+            hand[i][0] += 0.5 * shift_distance
+            hand[i][1] += 0.5 * shift_distance
+        else:
+            hand[i][0] += 0.5 * shift_distance
+            hand[i][1] -= 0.5 * shift_distance
     return hand
 
+# finger tips move 2 times than other parts of the finger
+
+
+def fingertip_noises(hand):
+    for i in range(0, len(hand)):
+        x_or_y = random.randint(0, 4)
+        shift_distance = random.randint(-4, 4)
+        if i % 4 == 0 and i != 0:
+            if x_or_y == 0:
+                hand[i][0] += shift_distance
+            elif x_or_y == 1:
+                hand[i][1] += shift_distance
+            elif x_or_y == 2:
+                hand[i][0] += 0.5 * shift_distance
+                hand[i][1] += 0.5 * shift_distance
+            else:
+                hand[i][0] += 0.5 * shift_distance
+                hand[i][1] -= 0.5 * shift_distance
+        elif (i == 0 or i == 5 or i == 9 or i == 13 or i == 17):
+            continue
+        else:
+            if x_or_y == 0:
+                hand[i][0] += 0.5 * shift_distance
+            elif x_or_y == 1:
+                hand[i][1] += 0.5 * shift_distance
+            elif x_or_y == 2:
+                hand[i][0] += 0.25 * shift_distance
+                hand[i][1] += 0.25 * shift_distance
+            else:
+                hand[i][0] += 0.25 * shift_distance
+                hand[i][1] -= 0.25 * shift_distance
+    return hand
+
+# shrink the size of the shrink
+
+
+def shrink_palm(hand):
+    for i in range(0, len(hand)):
+        shift_distance = random.uniform(0, 5)
+        if (i == 5 or i == 9 or i == 13 or i == 17):
+            distance_x = hand[0][0] - hand[i][0]
+            distance_y = hand[0][1] - hand[i][1]
+            distance = math.sqrt(distance_x ** 2 + distance_y ** 2)
+            shift_x = shift_distance * (distance_x / distance)
+            shift_y = shift_distance * (distance_y / distance)
+            hand[i][0] += shift_x
+            hand[i][1] += shift_y
+        else:
+            continue
+    return hand
+
+# move fingers as a whole
+
+
+def move_whole_finger(hand):
+    num = 6
+    finger1_distance = random.randint(-num, num)
+    finger2_distance = random.randint(-num, num)
+    finger3_distance = random.randint(-num, num)
+    finger4_distance = random.randint(-num, num)
+    finger5_distance = random.randint(-num, num)
+    finger1_direction = random.randint(0, 3)
+    finger2_direction = random.randint(0, 3)
+    finger3_direction = random.randint(0, 3)
+    finger4_direction = random.randint(0, 3)
+    finger5_direction = random.randint(0, 3)
+    for i in range(0, len(hand)):
+        if i == 0:
+            continue
+        elif i >= 1 & i <= 4:
+            if finger1_direction == 0:
+                hand[i][0] += finger1_distance
+            elif finger1_direction == 1:
+                hand[i][1] += finger1_distance
+            elif finger1_direction == 2:
+                hand[i][0] += 0.5 * finger1_distance
+                hand[i][1] += 0.5 * finger1_distance
+            else:
+                hand[i][0] += 0.5 * finger1_distance
+                hand[i][1] -= 0.5 * finger1_distance
+        elif i >= 5 & i <= 8:
+            if finger2_direction == 0:
+                hand[i][0] += finger2_distance
+            elif finger2_direction == 1:
+                hand[i][1] += finger2_distance
+            elif finger2_direction == 2:
+                hand[i][0] += 0.5 * finger2_distance
+                hand[i][1] += 0.5 * finger2_distance
+            else:
+                hand[i][0] += 0.5 * finger2_distance
+                hand[i][1] -= 0.5 * finger2_distance
+        elif i >= 9 & i <= 12:
+            if finger3_direction == 0:
+                hand[i][0] += finger3_distance
+            elif finger3_direction == 1:
+                hand[i][1] += finger3_distance
+            elif finger3_direction == 2:
+                hand[i][0] += 0.5 * finger3_distance
+                hand[i][1] += 0.5 * finger3_distance
+            else:
+                hand[i][0] += 0.5 * finger3_distance
+                hand[i][1] -= 0.5 * finger3_distance
+        elif i >= 13 & i <= 16:
+            if finger4_direction == 0:
+                hand[i][0] += finger4_distance
+            elif finger4_direction == 1:
+                hand[i][1] += finger4_distance
+            elif finger4_direction == 2:
+                hand[i][0] += 0.5 * finger4_distance
+                hand[i][1] += 0.5 * finger4_distance
+            else:
+                hand[i][0] += 0.5 * finger4_distance
+                hand[i][1] -= 0.5 * finger4_distance
+        else:
+            if finger5_direction == 0:
+                hand[i][0] += finger5_distance
+            elif finger5_direction == 1:
+                hand[i][1] += finger5_distance
+            elif finger5_direction == 2:
+                hand[i][0] += 0.5 * finger5_distance
+                hand[i][1] += 0.5 * finger5_distance
+            else:
+                hand[i][0] += 0.5 * finger5_distance
+                hand[i][1] -= 0.5 * finger5_distance
+    return hand
 
 # convex hull algorithm implementation
 
@@ -141,6 +273,7 @@ os.makedirs(outputMask, exist_ok=True)
 hand1 = np.zeros((21, 2))
 hand2 = np.zeros((21, 2))
 
+print('now doing 6 pixels')
 
 for video in sorted(os.listdir(root_multiColorSkeleton)):
     v = root_multiColorSkeleton + '\\' + video
@@ -168,9 +301,11 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
     noise_visualize_path = f'{outputMask}/noise_visualize'
     os.makedirs(noise_visualize_path, exist_ok=True)
     # visualize noises video
+    '''
     vid = cv2.VideoWriter_fourcc(*'mp4v')
     video_noise = cv2.VideoWriter(
         f'{noise_visPath}/noise_{video}.mp4', vid, 30, (244, 244))
+    '''
     # visualize video
     '''
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -202,6 +337,7 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 drawed = cv2.fillPoly(image, pts=[hand_1], color=(0, 255, 0))
                 '''
 
+                '''
                 x = [a[0] for a in hand_1]
                 y = [a[1] for a in hand_1]
                 x0, y0, x1, y1 = min(x), min(y), max(x), max(y)
@@ -238,15 +374,15 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 os.makedirs(f'{convex_hull_mask_path}/{video}', exist_ok=True)
                 cv2.imwrite(
                     f'{convex_hull_mask_path}/{video}/{frame}.png', convex_hull_crop)
-
+                '''
                 # save noise images, and then save those images as video
                 os.makedirs(f'{noise_visualize_path}/{video}', exist_ok=True)
-                noise_1 = random_noises(hand1)
+                noise_1 = move_whole_finger(hand1)
                 noise_figure = draw_skeleton(noise_img, 21, noise_1, hand2)
                 noise_figure.savefig(f'{noise_visualize_path}/{video}/{frame}.png',
                                      bbox_inches='tight', transparent=True, pad_inches=0)
-                video_noise.write(cv2.imread(
-                    f'{noise_visualize_path}/{video}/{frame}.png'))
+                #video_noise.write(cv2.imread(
+                #    f'{noise_visualize_path}/{video}/{frame}.png'))
                 '''
                 for i in hand_1:
                     # mask number set to 8
@@ -255,9 +391,11 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 os.makedirs(f'{maskPath}/{video}', exist_ok=True)
                 cv2.imwrite(f'{maskPath}/{video}/{frame}.png', mask)
                 '''
+                '''
                 # save cropped hands
                 os.makedirs(f'{cropPath}/{video}', exist_ok=True)
                 cv2.imwrite(f'{cropPath}/{video}/crop_{frame}.png', crop)
+                '''
                 '''
                 # save crop
                 cv2.putText(drawed, 'frame: {}'.format(frame_idx),
@@ -287,13 +425,14 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 # crop 2 hands
 
                 for hand in [hand_1, hand_2]:
+                    '''
                     x = [a[0] for a in hand]
                     y = [a[1] for a in hand]
-                    '''
+
                     for i in hand:
                         # mask number set to 8
                         mask[i[1], i[0]] = 8
-                    '''
+
                     x0, y0, x1, y1 = min(x), min(y), max(x), max(y)
                     crop[y0:y1, x0:x1, 0] = cropped[y0:y1, x0:x1, 0]
                     crop[y0:y1, x0:x1, 1] = cropped[y0:y1, x0:x1, 1]
@@ -339,25 +478,27 @@ for video in sorted(os.listdir(root_multiColorSkeleton)):
                 os.makedirs(f'{convex_hull_mask_path}/{video}', exist_ok=True)
                 cv2.imwrite(
                     f'{convex_hull_mask_path}/{video}/{frame}.png', convex_hull_crop)
-
+                '''
                 # save noise images, and then save those images as video
                 os.makedirs(f'{noise_visualize_path}/{video}', exist_ok=True)
-                noise_1 = random_noises(hand1)
-                noise_2 = random_noises(hand2)
+                noise_1 = move_whole_finger(hand1)
+                noise_2 = move_whole_finger(hand2)
                 noise_figure = draw_skeleton(noise_img, 42, noise_1, noise_2)
                 noise_figure.savefig(f'{noise_visualize_path}/{video}/{frame}.png',
                                      bbox_inches='tight', transparent=True, pad_inches=0)
-                video_noise.write(cv2.imread(
-                    f'{noise_visualize_path}/{video}/{frame}.png'))
+                #video_noise.write(cv2.imread(
+                #    f'{noise_visualize_path}/{video}/{frame}.png'))
 
                 '''
                 # save mask
                 os.makedirs(f'{maskPath}/{video}', exist_ok=True)
                 cv2.imwrite(f'{maskPath}/{video}/{frame}.png', mask)
                 '''
+                '''
                 # save crop hands
                 os.makedirs(f'{cropPath}/{video}', exist_ok=True)
                 cv2.imwrite(f'{cropPath}/{video}/crop_{frame}.png', crop)
+                '''
                 '''
                 cv2.putText(drawed, 'frame: {}'.format(frame_idx),
                             (0, 50), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (255, 0, 0))
